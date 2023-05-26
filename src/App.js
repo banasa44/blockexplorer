@@ -21,6 +21,8 @@ const alchemy = new Alchemy(settings);
 
 function App() {
   const [blockNumber, setBlockNumber] = useState();
+  const [blockTransactions, setBlockTransactions] = useState([]);
+  const [showTransactions, setShowTransactions] = useState(false);
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -28,9 +30,45 @@ function App() {
     }
 
     getBlockNumber();
-  });
+  }, []);
 
-  return <div className="App">Block Number: {blockNumber}</div>;
+  useEffect(() => {
+    async function getBlockTransactions() {
+      const block = await alchemy.core.getBlockWithTransactions();
+      setBlockTransactions(block.transactions || []);
+    }
+
+    if (showTransactions) {
+      getBlockTransactions();
+    }
+  }, [showTransactions]);
+
+  const toggleTransactions = () => {
+    setShowTransactions(!showTransactions);
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Block Information</h1>
+      </header>
+      <main>
+        <h2>Block Number: {blockNumber}</h2>
+        <button onClick={toggleTransactions}>
+          {showTransactions ? "Hide Transactions" : "Show Transactions"}
+        </button>
+        {showTransactions && (
+          <div>
+            <h3>Transactions:</h3>
+            {blockTransactions.map((tx) => (
+              <p key={tx.hash}>{tx.hash}</p>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }
+
 
 export default App;
