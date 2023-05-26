@@ -6,6 +6,7 @@ import {
   Route,
   Switch,
   useParams,
+  Redirect,
 } from "react-router-dom";
 import YourBalance from "./YourBalance";
 
@@ -118,21 +119,28 @@ function App() {
   console.log("Rendering App component");
 
   return (
-    <Router>
-      <div className="App">
-        <header className="App-header">
-          <h1>Block Information</h1>
-        </header>
-        <main>
-          <h2>Block Number: {blockNumber}</h2>
-          <div>
-            <Link to="/your-balance">Your Balance</Link>
-          </div>
-          <div>
-            <button onClick={toggleTransactions}>
-              {showTransactions ? "Hide Transactions" : "Show Transactions"}
-            </button>
-          </div>
+<Router>
+  <div className="App">
+    <header className="App-header">
+      <h1>Block Information</h1>
+    </header>
+    <main>
+      <h2>Block Number: {blockNumber}</h2>
+      <div>
+        <Link to="/your-balance">Your Balance</Link>
+      </div>
+      <div>
+        <Link to="/transactions">All Transactions</Link>
+      </div>
+      
+      <Switch>
+        <Route exact path="/your-balance">
+          <YourBalance alchemy={alchemy} onBalanceClick={toggleTransactions} />
+        </Route>
+        <Route exact path="/transactions">
+          <button onClick={toggleTransactions}>
+            {showTransactions ? 'Hide Transactions' : 'Show Transactions'}
+          </button>
           {showTransactions && (
             <div>
               <h3>Transactions:</h3>
@@ -146,23 +154,21 @@ function App() {
               {blockTransactions.length > transactionsPerPage && (
                 <Pagination
                   currentPage={currentPage}
-                  totalPages={Math.ceil(
-                    blockTransactions.length / transactionsPerPage
-                  )}
+                  totalPages={Math.ceil(blockTransactions.length / transactionsPerPage)}
                   onPageChange={setCurrentPage}
                 />
               )}
             </div>
           )}
-        </main>
-      </div>
-      <Switch>
+        </Route>
         <Route path="/transactions/:txHash">
           <TransactionDetails />
         </Route>
+        <Redirect to="/your-balance" />
       </Switch>
-      <YourBalance alchemy={alchemy} />
-    </Router>
+    </main>
+  </div>
+</Router>
   );
 }
 
