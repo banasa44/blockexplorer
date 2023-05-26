@@ -1,28 +1,66 @@
 import { Alchemy, Network } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Link, Route, Switch, useParams } from 'react-router-dom';
 
 import './App.css';
 
-// Refer to the README doc for more information about using API
-// keys in client-side code. You should never do this in production
-// level code.
 const settings = {
   apiKey: process.env.REACT_APP_ALCHEMY_API_KEY,
   network: Network.ETH_MAINNET,
 };
 
-
-// In this week's lessons we used ethers.js. Here we are using the
-// Alchemy SDK is an umbrella library with several different packages.
-//
-// You can read more about the packages here:
-//   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
 const alchemy = new Alchemy(settings);
+
+function Pagination({ currentPage, totalPages, onPageChange }) {
+  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
+
+  return (
+    <div>
+      {pageNumbers.map((page) => (
+        <button key={page} onClick={() => onPageChange(page)} disabled={currentPage === page}>
+          {page}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function TransactionDetails() {
+  const { txHash } = useParams();
+  const [transaction, setTransaction] = useState(null);
+
+  useEffect(() => {
+    async function getTransactionDetails() {
+      const tx = await alchemy.core.getTransactionReceipt(txHash);
+      setTransaction(tx);
+    }
+
+    getTransactionDetails();
+  }, [txHash]);
+
+  if (!transaction) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      <h2>Transaction Details</h2>
+      <p>Hash: {transaction.transactionHash}</p>
+      <p>To: {transaction.to}</p>
+      <p>From: {transaction.from}</p>
+      <p>Contract Address: {transaction.contractAddress}</p>
+      <p>Transaction Index: {transaction.transactionIndex}</p>
+      <p>Gas Used: {transaction.gasUsed.toString()}</p>
+    </div>
+  );
+}
 
 function App() {
   const [blockNumber, setBlockNumber] = useState();
   const [blockTransactions, setBlockTransactions] = useState([]);
   const [showTransactions, setShowTransactions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const transactionsPerPage = 10;
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -47,28 +85,57 @@ function App() {
     setShowTransactions(!showTransactions);
   };
 
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  const indexOfLastTransaction = currentPage * transactionsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+  const currentTransactions = blockTransactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Block Information</h1>
-      </header>
-      <main>
-        <h2>Block Number: {blockNumber}</h2>
-        <button onClick={toggleTransactions}>
-          {showTransactions ? "Hide Transactions" : "Show Transactions"}
-        </button>
-        {showTransactions && (
-          <div>
-            <h3>Transactions:</h3>
-            {blockTransactions.map((tx) => (
-              <p key={tx.hash}>{tx.hash}</p>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <h1>Block Information</h1>
+        </header>
+        <main>
+          <h2>Block Number: {blockNumber}</h2>
+          <button onClick={toggleTransactions}>
+            {showTransactions ? 'Hide Transactions' : 'Show Transactions'}
+          </button>
+          {showTransactions && (
+            <div>
+              <h3>Transactions:</h3>
+              <ul>
+                {currentTransactions.map((tx) => (
+                  <li key={tx.hash}>
+                    <Link to={`/transactions/${tx.hash}`}>{tx.hash}</Link>
+                  </li>
+                ))}
+              </ul>
+              {blockTransactions.length > transactionsPerPage && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(blockTransactions.length / transactionsPerPage)}
+                  onPageChange={setCurrentPage}
+                />
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+      <Switch>
+        <Route path="/transactions/:txHash">
+          <TransactionDetails />
+        </Route>
+      </Switch>
+    </Router>
   );
 }
-
 
 export default App;
