@@ -12,18 +12,21 @@ const settings = {
 const alchemy = new Alchemy(settings);
 
 function Pagination({ currentPage, totalPages, onPageChange }) {
-  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
-
   return (
     <div>
-      {pageNumbers.map((page) => (
-        <button key={page} onClick={() => onPageChange(page)} disabled={currentPage === page}>
-          {page}
-        </button>
-      ))}
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+        Previous
+      </button>
+      <span>Page {currentPage} of {totalPages}</span>
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+        Next
+      </button>
     </div>
   );
 }
+
+
+
 
 function TransactionDetails() {
   const { txHash } = useParams();
@@ -85,13 +88,13 @@ function App() {
     setShowTransactions(!showTransactions);
   };
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
+  // const handleNextPage = () => {
+  //   setCurrentPage((prevPage) => prevPage + 1);
+  // };
 
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
+  // const handlePrevPage = () => {
+  //   setCurrentPage((prevPage) => prevPage - 1);
+  // };
 
   const indexOfLastTransaction = currentPage * transactionsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
