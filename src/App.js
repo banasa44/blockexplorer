@@ -1,6 +1,8 @@
 import { Alchemy, Network } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Link, Route, Switch, useParams } from 'react-router-dom';
+import YourBalance from './YourBalance';
+
 
 import './App.css';
 
@@ -100,6 +102,8 @@ function App() {
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
   const currentTransactions = blockTransactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
+  console.log('Rendering App component');
+
   return (
     <Router>
       <div className="App">
@@ -108,6 +112,7 @@ function App() {
         </header>
         <main>
           <h2>Block Number: {blockNumber}</h2>
+          <Link to="/your-balance">Your Balance</Link>
           <button onClick={toggleTransactions}>
             {showTransactions ? 'Hide Transactions' : 'Show Transactions'}
           </button>
@@ -135,6 +140,9 @@ function App() {
       <Switch>
         <Route path="/transactions/:txHash">
           <TransactionDetails />
+        </Route>
+        <Route path="/your-balance">
+        <YourBalance alchemy={alchemy} />
         </Route>
       </Switch>
     </Router>
