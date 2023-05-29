@@ -19,6 +19,27 @@ const settings = {
 
 const alchemy = new Alchemy(settings);
 
+const DefaultPage = ({ blockNumber }) => {
+  return (
+    <div>
+      <h2>Block Number: {blockNumber}</h2>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/your-balance">Your Balance</Link>
+          </li>
+          <li>
+            <Link to="/transactions">All Transactions</Link>
+          </li>
+          <li>
+            <Link to="/nft">NFT Page</Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
+};
+
 function Pagination({ currentPage, totalPages, onPageChange }) {
   return (
     <div>
@@ -131,64 +152,64 @@ const App = () => {
       <div className="App">
         <header className="App-header">
           <h1>Block Information</h1>
+          <nav>
+            <ul>
+              <li>
+                <Link to="/your-balance">Your Balance</Link>
+              </li>
+              <li>
+                <Link to="/transactions">All Transactions</Link>
+              </li>
+              <li>
+                <Link to="/nft">NFT Page</Link>
+              </li>
+            </ul>
+          </nav>
         </header>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/your-balance">Your Balance</Link>
-            </li>
-            <li>
-              <Link to="/transactions">All Transactions</Link>
-            </li>
-            <li>
-              <Link to="/nft">NFT Page</Link> {/* New link to the NFT page */}
-            </li>
-          </ul>
-        </nav>
-        <main>
-          <h2>Block Number: {blockNumber}</h2>
-          <Switch>
-            <Route exact path="/your-balance">
-              <YourBalance
-                alchemy={alchemy}
-                onBalanceClick={toggleTransactions}
-              />
-            </Route>
-            <Route exact path="/nft">
-              <NFTPage />
-            </Route>
-            <Route exact path="/transactions">
-              <button onClick={toggleTransactions}>
-                {showTransactions ? "Hide Transactions" : "Show Transactions"}
-              </button>
-              {showTransactions && (
-                <div>
-                  <h3>Transactions:</h3>
-                  <ul>
-                    {currentTransactions.map((tx) => (
-                      <li key={tx.hash}>
-                        <Link to={`/transactions/${tx.hash}`}>{tx.hash}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                  {blockTransactions.length > transactionsPerPage && (
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={Math.ceil(
-                        blockTransactions.length / transactionsPerPage
-                      )}
-                      onPageChange={setCurrentPage}
-                    />
-                  )}
-                </div>
-              )}
-            </Route>
-            <Route path="/transactions/:txHash">
-              <TransactionDetails />
-            </Route>
-            <Redirect to="/your-balance" />
-          </Switch>
-        </main>
+        <Switch>
+          <Route exact path="/">
+            <DefaultPage blockNumber={blockNumber} />
+          </Route>
+          <Route exact path="/your-balance">
+            <YourBalance
+              alchemy={alchemy}
+              onBalanceClick={toggleTransactions}
+            />
+          </Route>
+          <Route exact path="/nft">
+            <NFTPage />
+          </Route>
+          <Route exact path="/transactions">
+            <button onClick={toggleTransactions}>
+              {showTransactions ? "Hide Transactions" : "Show Transactions"}
+            </button>
+            {showTransactions && (
+              <div>
+                <h3>Transactions:</h3>
+                <ul>
+                  {currentTransactions.map((tx) => (
+                    <li key={tx.hash}>
+                      <Link to={`/transactions/${tx.hash}`}>{tx.hash}</Link>
+                    </li>
+                  ))}
+                </ul>
+                {blockTransactions.length > transactionsPerPage && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(
+                      blockTransactions.length / transactionsPerPage
+                    )}
+                    onPageChange={setCurrentPage}
+                  />
+                )}
+              </div>
+            )}
+          </Route>
+          <Route path="/transactions/:txHash">
+            <TransactionDetails />
+          </Route>
+          <Redirect to="/" />
+        </Switch>
       </div>
     </Router>
   );
