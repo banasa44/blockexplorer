@@ -70,8 +70,24 @@ function TransactionDetails() {
     </div>
   );
 }
+// Define the NFTPage component
+const NFTPage = () => {
+  return (
+    <div>
+      <header>
+        <h1>NFT Information</h1>
+        {/* Add any additional header content specific to the NFT page */}
+      </header>
+      <main>
+        {/* Add your NFT page content */}
+        <h2>NFTs</h2>
+        {/* Additional NFT-related components */}
+      </main>
+    </div>
+  );
+};
 
-function App() {
+const App = () => {
   const [blockNumber, setBlockNumber] = useState();
   const [blockTransactions, setBlockTransactions] = useState([]);
   const [showTransactions, setShowTransactions] = useState(false);
@@ -101,14 +117,6 @@ function App() {
     setShowTransactions(!showTransactions);
   };
 
-  // const handleNextPage = () => {
-  //   setCurrentPage((prevPage) => prevPage + 1);
-  // };
-
-  // const handlePrevPage = () => {
-  //   setCurrentPage((prevPage) => prevPage - 1);
-  // };
-
   const indexOfLastTransaction = currentPage * transactionsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
   const currentTransactions = blockTransactions.slice(
@@ -119,57 +127,71 @@ function App() {
   console.log("Rendering App component");
 
   return (
-<Router>
-  <div className="App">
-    <header className="App-header">
-      <h1>Block Information</h1>
-    </header>
-    <main>
-      <h2>Block Number: {blockNumber}</h2>
-      <div>
-        <Link to="/your-balance">Your Balance</Link>
-      </div>
-      <div>
-        <Link to="/transactions">All Transactions</Link>
-      </div>
-      
-      <Switch>
-        <Route exact path="/your-balance">
-          <YourBalance alchemy={alchemy} onBalanceClick={toggleTransactions} />
-        </Route>
-        <Route exact path="/transactions">
-          <button onClick={toggleTransactions}>
-            {showTransactions ? 'Hide Transactions' : 'Show Transactions'}
-          </button>
-          {showTransactions && (
-            <div>
-              <h3>Transactions:</h3>
-              <ul>
-                {currentTransactions.map((tx) => (
-                  <li key={tx.hash}>
-                    <Link to={`/transactions/${tx.hash}`}>{tx.hash}</Link>
-                  </li>
-                ))}
-              </ul>
-              {blockTransactions.length > transactionsPerPage && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={Math.ceil(blockTransactions.length / transactionsPerPage)}
-                  onPageChange={setCurrentPage}
-                />
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <h1>Block Information</h1>
+        </header>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/your-balance">Your Balance</Link>
+            </li>
+            <li>
+              <Link to="/transactions">All Transactions</Link>
+            </li>
+            <li>
+              <Link to="/nft">NFT Page</Link> {/* New link to the NFT page */}
+            </li>
+          </ul>
+        </nav>
+        <main>
+          <h2>Block Number: {blockNumber}</h2>
+          <Switch>
+            <Route exact path="/your-balance">
+              <YourBalance
+                alchemy={alchemy}
+                onBalanceClick={toggleTransactions}
+              />
+            </Route>
+            <Route exact path="/nft">
+              <NFTPage />
+            </Route>
+            <Route exact path="/transactions">
+              <button onClick={toggleTransactions}>
+                {showTransactions ? "Hide Transactions" : "Show Transactions"}
+              </button>
+              {showTransactions && (
+                <div>
+                  <h3>Transactions:</h3>
+                  <ul>
+                    {currentTransactions.map((tx) => (
+                      <li key={tx.hash}>
+                        <Link to={`/transactions/${tx.hash}`}>{tx.hash}</Link>
+                      </li>
+                    ))}
+                  </ul>
+                  {blockTransactions.length > transactionsPerPage && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={Math.ceil(
+                        blockTransactions.length / transactionsPerPage
+                      )}
+                      onPageChange={setCurrentPage}
+                    />
+                  )}
+                </div>
               )}
-            </div>
-          )}
-        </Route>
-        <Route path="/transactions/:txHash">
-          <TransactionDetails />
-        </Route>
-        <Redirect to="/your-balance" />
-      </Switch>
-    </main>
-  </div>
-</Router>
+            </Route>
+            <Route path="/transactions/:txHash">
+              <TransactionDetails />
+            </Route>
+            <Redirect to="/your-balance" />
+          </Switch>
+        </main>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
