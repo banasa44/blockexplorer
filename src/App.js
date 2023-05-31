@@ -9,6 +9,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import YourBalance from "./YourBalance";
+import NFTInfo from "./NFTPage";
 
 import "./App.css";
 
@@ -91,22 +92,6 @@ function TransactionDetails() {
     </div>
   );
 }
-// Define the NFTPage component
-const NFTPage = () => {
-  return (
-    <div>
-      <header>
-        <h1>NFT Information</h1>
-        {/* Add any additional header content specific to the NFT page */}
-      </header>
-      <main>
-        {/* Add your NFT page content */}
-        <h2>NFTs</h2>
-        {/* Additional NFT-related components */}
-      </main>
-    </div>
-  );
-};
 
 const App = () => {
   const [blockNumber, setBlockNumber] = useState();
@@ -177,7 +162,7 @@ const App = () => {
             />
           </Route>
           <Route exact path="/nft">
-            <NFTPage />
+            <NFTInfo />
           </Route>
           <Route exact path="/transactions">
             <button onClick={toggleTransactions}>
