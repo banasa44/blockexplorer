@@ -55,18 +55,22 @@ function NFTInfo() {
     <div>
       <h2>NFT Information</h2>
       <form onSubmit={handleSubmit}>
-        <label>
-          Contract Address:
-          <input
-            type="text"
-            value={contractAddress}
-            onChange={handleContractAddressChange}
-          />
-        </label>
-        <label>
-          Token ID:
-          <input type="text" value={tokenID} onChange={handleTokenIDChange} />
-        </label>
+        <div>
+          <label>
+            Contract Address:
+            <input
+              type="text"
+              value={contractAddress}
+              onChange={handleContractAddressChange}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Token ID:
+            <input type="text" value={tokenID} onChange={handleTokenIDChange} />
+          </label>
+        </div>
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Loading..." : "Submit"}
         </button>
@@ -75,16 +79,27 @@ function NFTInfo() {
         <p>Loading NFT information...</p>
       ) : nftInfo ? (
         <div>
-          <p>Requested NFT Info:</p>
-          <p>Name: {nftInfo.contract.name}</p>
+          <h3>{nftInfo.contract.name}</h3>
           <p>Symbol: {nftInfo.contract.symbol}</p>
-          <p>TotalSupply: {nftInfo.contract.totalSupply}</p>
+          <p>Total Supply: {nftInfo.contract.totalSupply}</p>
           <p>Description: {nftInfo.description}</p>
+          {/* Additional functionality: Open the image in a new tab */}
+          <br /> {/* Add a line break */}
           <img
             src={nftInfo.rawMetadata.image}
             alt={nftInfo.contract.name}
             style={{ maxWidth: "700px" }} // Adjust the maximum width as needed
           />
+          <br /> 
+          <br /> 
+          <a
+            href={nftInfo.rawMetadata.image}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Full Image
+          </a>
+          <br /> <br /> <br /> 
         </div>
       ) : null}
     </div>
